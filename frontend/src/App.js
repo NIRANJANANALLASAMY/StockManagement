@@ -1,7 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-
-//import Home from "./components/user/Home";
 
 import Login from "./components/Login";
 import AddProductPage from "./components/admin/AddProductPage";
@@ -14,27 +12,48 @@ import CategoryPage from "./components/admin/CategoryPage";
 import CategoryDetail from "./components/admin/CategoryDetail";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import ByBrand from "./components/admin/ByBrand";
-import AdminNavbar from "./components/admin/AdminNavbar"; // Create this if not exists
+import RequirementPage from "./components/admin/RequirementPage";
+import AdminNavbar from "./components/admin/AdminNavbar";
+
+import Home from "./components/user/Home";
+import About from "./components/user/About";
+import Contact from "./components/user/Contact";
+import Product from "./components/user/Products";
+import Navbar from "./components/user/Navbar";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   const location = useLocation();
   const userRole = localStorage.getItem("userRole");
+
   const hideNavbarPaths = ["/"];
 
-  //const showCustomerNavbar = userRole === "customer" && !hideNavbarPaths.includes(location.pathname);
   const showAdminNavbar = userRole === "admin" && !hideNavbarPaths.includes(location.pathname);
+  const showUserNavbar = userRole === "customer" && !hideNavbarPaths.includes(location.pathname);
+
+  const [lowStockItemsList, setLowStockItemsList] = useState([]);
 
   return (
     <>
-      
       {showAdminNavbar && <AdminNavbar />}
-      
+      {showUserNavbar && <Navbar />}
+
       <Routes>
+        {/* Login */}
         <Route path="/" element={<Login />} />
-        
-         <Route path="/add-product/:brandName" element={<AddProductPage />} />
+
+        {/* User Routes */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/products" element={<Product />} />
+        <Route path="/contact" element={<Contact />} />
+
+        <Route path="/admin/RequirementPage"
+          element={<RequirementPage setLowStockItemsList={setLowStockItemsList} />} />
+
+        {/* Admin Routes */}
+        <Route path="/add-product/:brandName" element={<AddProductPage />} />
         <Route path="/admin-home" element={<AdminHome />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/manage-stock" element={<ManageStock />} />
@@ -42,8 +61,9 @@ function App() {
         <Route path="/admin/stock-list" element={<StockList />} />
         <Route path="/admin/categorypage" element={<CategoryPage />} />
         <Route path="/category/:id" element={<CategoryDetail />} />
-        <Route path="/admin/AdminDashboard" element={<AdminDashboard />} />
-        <Route path="/admin/ByBrand" element={<ByBrand />} />
+        <Route path="/admin/admindashboard" element={<AdminDashboard />} />
+        <Route path="/admin/bybrand" element={<ByBrand />} />
+        <Route path="/admin/requirementpage" element={<RequirementPage />} />
       </Routes>
     </>
   );
