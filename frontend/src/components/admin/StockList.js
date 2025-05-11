@@ -1,111 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import AdminNavbar from './AdminNavbar'; // Optional, can remove if not needed
+import React, { useState } from 'react';
+import AdminNavbar from './AdminNavbar';
 
-const StockList = () => {
-  const [products, setProducts] = useState([]);
-  const [sortedProducts, setSortedProducts] = useState([]);
+const DailySaleUpdate = () => {
+  const [materialName, setMaterialName] = useState('');
+  const [todaysSale, setTodaysSale] = useState('');
+  const [salesData, setSalesData] = useState([]);
 
-  useEffect(() => {
-    fetchStock();
-  }, []);
-  
-  const fetchStock = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/products');
-      setProducts(res.data);
-      setSortedProducts(res.data);
-    } catch (error) {
-      console.error('Error fetching stock:', error);
+  const currentDate = new Date().toLocaleDateString();
+
+  const handleUpdate = () => {
+    if (!materialName || !todaysSale) {
+      alert('Please fill all fields!');
+      return;
     }
+
+    const updatedEntry = {
+      id: Date.now().toString(),
+      materialName,
+      todaysSale: parseInt(todaysSale),
+    };
+
+    setSalesData([...salesData, updatedEntry]);
+    setMaterialName('');
+    setTodaysSale('');
   };
 
-  const sortLowToHigh = () => {
-    const sorted = [...products].sort((a, b) => a.qty - b.qty);
-    setSortedProducts(sorted);
+  const inputStyle = {
+    padding: '8px',
+    marginRight: '10px',
+    width: '200px',
+    boxSizing: 'border-box',
   };
 
-  const sortHighToLow = () => {
-    const sorted = [...products].sort((a, b) => b.qty - a.qty);
-    setSortedProducts(sorted);
+  const buttonStyle = {
+    padding: '8px',
+    width: '200px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
   };
 
-  const sortAlphabetical = () => {
-    const sorted = [...products].sort((a, b) => a.name.localeCompare(b.name));
-    setSortedProducts(sorted);
+  const tableStyle = {
+    width: '100%',
+    borderCollapse: 'collapse',
+    marginTop: '20px',
+  };
+
+  const thTdStyle = {
+    border: '1px solid #ccc',
+    padding: '10px',
+    textAlign: 'center',
   };
 
   return (
     <>
       <AdminNavbar />
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(to right, #74ebd5, #ACB6E5)',
-        padding: '40px',
-        textAlign: 'center'
-      }}>
-        <h2 style={{ marginBottom: '20px', color: '#003366' }}>📦 Stock Availability</h2>
+      <div style={{ padding: '40px 20px' }}>
+        <h2>Daily Sale Update</h2>
+        <p><strong>Date:</strong> {currentDate}</p>
 
-        <table style={{
-          margin: 'auto',
-          width: '70%',
-          borderCollapse: 'collapse',
-          backgroundColor: '#ffffffdd',
-          borderRadius: '12px',
-          overflow: 'hidden'
-        }}>
-          <thead style={{ backgroundColor: '#4682B4', color: '#fff' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+          <input
+            type="text"
+            placeholder="Material Name"
+            value={materialName}
+            onChange={(e) => setMaterialName(e.target.value)}
+            style={inputStyle}
+          />
+          <input
+            type="number"
+            placeholder="Today's Sale (Qty)"
+            value={todaysSale}
+            onChange={(e) => setTodaysSale(e.target.value)}
+            style={inputStyle}
+          />
+          <button onClick={handleUpdate} style={buttonStyle}>
+            Update
+          </button>
+        </div>
+
+        <table style={tableStyle}>
+          <thead>
             <tr>
-              <th style={thStyle}>Product Name</th>
-              <th style={thStyle}>Available Quantity</th>
+              <th style={thTdStyle}>Material Name</th>
+              <th style={thTdStyle}>Today's Sale</th>
             </tr>
           </thead>
           <tbody>
-            {sortedProducts.map((prod) => (
-              <tr key={prod._id}>
-                <td style={tdStyle}>{prod.name}</td>
-                <td style={tdStyle}>{prod.qty}</td>
+            {salesData.map((item) => (
+              <tr key={item.id}>
+                <td style={thTdStyle}>{item.materialName}</td>
+                <td style={thTdStyle}>{item.todaysSale}</td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        <div style={{
-          marginTop: '30px',
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '20px'
-        }}>
-          <button onClick={sortLowToHigh} style={btnStyle}>Qty: Low to High</button>
-          <button onClick={sortHighToLow} style={btnStyle}>Qty: High to Low</button>
-          <button onClick={sortAlphabetical} style={btnStyle}>Alphabetical</button>
-        </div>
       </div>
     </>
   );
 };
 
-const thStyle = {
-  padding: '12px',
-  borderBottom: '2px solid #ddd'
-};
-
-const tdStyle = {
-  padding: '12px',
-  borderBottom: '1px solid #eee'
-};
-
-const btnStyle = {
-  padding: '12px 20px',
-  width: '180px',
-  borderRadius: '8px',
-  border: 'none',
-  backgroundColor: '#0077b6',
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: '14px',
-  cursor: 'pointer',
-  transition: '0.3s'
-};
-
-export default StockList;
+export default DailySaleUpdate;
